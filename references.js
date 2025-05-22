@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Criar popup dinamicamente
     const popup = document.createElement('div');
     popup.id = 'popup';
     popup.style.position = 'absolute';
@@ -26,7 +25,6 @@ document.addEventListener('DOMContentLoaded', function () {
     popup.appendChild(popupContent);
     document.body.appendChild(popup);
 
-    // Função para detectar e transformar versículos automaticamente
     function detectarVersiculos() {
         const content = document.querySelector('.content');
         const regex = /\b([A-ZÁÉÍÓÚ][a-záéíóú]+)\s(\d+):(\d+(-\d+)?)\b/g;
@@ -36,7 +34,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return `<span class="versiculo" data-ref="${ref}" data-chapter="${capitulo}" data-verse="${versiculo}">${match}</span>`;
         });
 
-        // Adicionar eventos aos versículos identificados
         document.querySelectorAll('.versiculo').forEach(versiculo => {
             versiculo.addEventListener('click', async function (e) {
                 const file = versiculo.getAttribute('data-ref');
@@ -67,9 +64,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    detectarVersiculos(); // Chamada da função após o carregamento da página
+    detectarVersiculos();
 
-    // Evento para fechar o popup ao clicar fora dele
     document.addEventListener('click', function (e) {
         if (!popup.contains(e.target) && !e.target.classList.contains('versiculo')) {
             popup.style.display = 'none';
