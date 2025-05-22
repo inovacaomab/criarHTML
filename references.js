@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // Criar popup dinamicamente
     const popup = document.createElement('div');
     popup.id = 'popup';
     popup.style.position = 'absolute';
@@ -23,39 +24,55 @@ document.addEventListener('DOMContentLoaded', function () {
     const popupContent = document.createElement('div');
     popupContent.className = 'popup-content';
     popup.appendChild(popupContent);
-
     document.body.appendChild(popup);
 
-    function detectarVersiculos(texto) {
+    // Função para detectar e transformar versículos automaticamente
+    function detectarVersiculos() {
+        const content = document.querySelector('.content');
         const regex = /\b([A-ZÁÉÍÓÚ][a-záéíóú]+)\s(\d+):(\d+(-\d+)?)\b/g;
-        return texto.replace(regex, (match, livro, capitulo, versiculo) => {
-            const ref = `acf-${livro.toLowerCase().slice(0,2)}.xml`;
+        
+        content.innerHTML = content.innerHTML.replace(regex, (match, livro, capitulo, versiculo) => {
+            const ref = `acf-${livro.toLowerCase().replace(/\s/g, '')}.xml`; // Ajuste no nome do arquivo
             return `<span class="versiculo" data-ref="${ref}" data-chapter="${capitulo}" data-verse="${versiculo}">${match}</span>`;
+        });
+
+        // Adicionar eventos aos versículos identificados
+        document.querySelectorAll('.versiculo').forEach(versiculo => {
+            versiculo.addEventListener('click', async function (e) {
+                const file = versiculo.getAttribute('data-ref');
+                const chapter = versiculo.getAttribute('data-chapter');
+                const verse = versiculo.getAttribute('data-verse');
+                const url = `https://inovacaomab.github.io/bibliaACFestudo/acf/${file}`;
+
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`Erro ao acessar ${url}`);
+
+                    const xmlText = await response.text();
+                    const xmlDoc = new DOMParser().parseFromString(xmlText, 'text/xml');
+                    
+                    // Ajuste na busca dentro do XML
+                    const chapterElement = xmlDoc.querySelector(`chapter[number="${chapter}"]`);
+                    const verseElement = chapterElement ? chapterElement.querySelector(`verse[number="${verse}"]`) : null;
+                    const verseText = verseElement ? verseElement.textContent : 'Versículo não encontrado.';
+
+                    popupContent.innerHTML = `<strong>${versiculo.textContent}</strong><br>${verseText}`;
+                    popup.style.display = 'block';
+                    popup.style.left = `${e.pageX + 10}px`;
+                    popup.style.top = `${e.pageY + 10}px`;
+                } catch (error) {
+                    popupContent.innerHTML = `Erro ao carregar o versículo: ${error.message}`;
+                }
+            });
         });
     }
 
-    const content = document.querySelector('.content');
-    content.innerHTML = detectarVersiculos(content.innerHTML);
+    detectarVersiculos(); // Chamada da função após o carregamento da página
 
-    document.querySelectorAll('.versiculo').forEach(versiculo => {
-        versiculo.addEventListener('click', async function (e) {
-            const file = versiculo.getAttribute('data-ref');
-            const chapter = versiculo.getAttribute('data-chapter');
-            const verse = versiculo.getAttribute('data-verse');
-            const url = `https://inovacaomab.github.io/bibliaACFestudo/acf/${file}`;
-
-            try {
-                const response = await fetch(url);
-                const xmlText = await response.text();
-                const xmlDoc = new DOMParser().parseFromString(xmlText, 'text/xml');
-                const verseText = xmlDoc.querySelector(`chapter[number="${chapter}"] verse[number="${verse}"]`)?.textContent || 'Versículo não encontrado.';
-                popupContent.innerHTML = `<strong>${versiculo.textContent}</strong><br>${verseText}`;
-                popup.style.display = 'block';
-                popup.style.left = `${e.pageX + 10}px`;
-                popup.style.top = `${e.pageY + 10}px`;
-            } catch {
-                popupContent.innerHTML = 'Erro ao carregar o versículo.';
-            }
-        });
+    // Evento para fechar o popup ao clicar fora dele
+    document.addEventListener('click', function (e) {
+        if (!popup.contains(e.target) && !e.target.classList.contains('versiculo')) {
+            popup.style.display = 'none';
+        }
     });
 });
