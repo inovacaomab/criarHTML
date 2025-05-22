@@ -5,7 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Referências Bíblicas Personalizadas</title>
     <style>
-        /* Estilos mantidos conforme seu código original */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        .content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .versiculo {
+            color: blue;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .popup {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            z-index: 1000;
+            width: 350px;
+            border-radius: 5px;
+        }
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f0f0f0;
+            border-bottom: 1px solid #ccc;
+            padding: 5px 10px;
+            font-weight: bold;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+        .popup-header button {
+            background-color: transparent;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .popup-header button:hover {
+            color: red;
+        }
+        .popup-content {
+            padding: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .popup-footer {
+            background-color: #f0f0f0;
+            border-top: 1px solid #ccc;
+            text-align: center;
+            padding: 5px;
+            font-size: 12px;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -40,38 +100,38 @@
             const popupContent = document.getElementById('popupContent');
             const closePopup = document.getElementById('closePopup');
 
-            function detectarVersiculos(texto) {
+            function detectarVersiculos() {
+                const content = document.querySelector('.content');
                 const regex = /\b([A-ZÁÉÍÓÚ][a-záéíóú]+)\s(\d+):(\d+(-\d+)?)\b/g;
-                return texto.replace(regex, (match, livro, capitulo, versiculo) => {
+                content.innerHTML = content.innerHTML.replace(regex, (match, livro, capitulo, versiculo) => {
                     const ref = `acf-${livro.toLowerCase().slice(0,2)}.xml`;
                     return `<span class="versiculo" data-ref="${ref}" data-chapter="${capitulo}" data-verse="${versiculo}">${match}</span>`;
                 });
+
+                document.querySelectorAll('.versiculo').forEach(versiculo => {
+                    versiculo.addEventListener('click', async function (e) {
+                        const file = versiculo.getAttribute('data-ref');
+                        const chapter = versiculo.getAttribute('data-chapter');
+                        const verse = versiculo.getAttribute('data-verse');
+                        const url = `https://inovacaomab.github.io/bibliaACFestudo/acf/${file}`;
+
+                        try {
+                            const response = await fetch(url);
+                            const xmlText = await response.text();
+                            const xmlDoc = new DOMParser().parseFromString(xmlText, 'text/xml');
+                            const verseText = xmlDoc.querySelector(`chapter[number="${chapter}"] verse[number="${verse}"]`)?.textContent || 'Versículo não encontrado.';
+                            popupContent.innerHTML = `<strong>${versiculo.textContent}</strong><br>${verseText}`;
+                            popup.style.display = 'block';
+                            popup.style.left = `${e.pageX + 10}px`;
+                            popup.style.top = `${e.pageY + 10}px`;
+                        } catch {
+                            popupContent.innerHTML = 'Erro ao carregar o versículo.';
+                        }
+                    });
+                });
             }
 
-            const content = document.querySelector('.content');
-            content.innerHTML = detectarVersiculos(content.innerHTML);
-
-            document.querySelectorAll('.versiculo').forEach(versiculo => {
-                versiculo.addEventListener('click', async function (e) {
-                    const file = versiculo.getAttribute('data-ref');
-                    const chapter = versiculo.getAttribute('data-chapter');
-                    const verse = versiculo.getAttribute('data-verse');
-                    const url = `https://inovacaomab.github.io/bibliaACFestudo/acf/${file}`;
-
-                    try {
-                        const response = await fetch(url);
-                        const xmlText = await response.text();
-                        const xmlDoc = new DOMParser().parseFromString(xmlText, 'text/xml');
-                        const verseText = xmlDoc.querySelector(`chapter[number="${chapter}"] verse[number="${verse}"]`)?.textContent || 'Versículo não encontrado.';
-                        popupContent.innerHTML = `<strong>${versiculo.textContent}</strong><br>${verseText}`;
-                        popup.style.display = 'block';
-                        popup.style.left = `${e.pageX + 10}px`;
-                        popup.style.top = `${e.pageY + 10}px`;
-                    } catch {
-                        popupContent.innerHTML = 'Erro ao carregar o versículo.';
-                    }
-                });
-            });
+            detectarVersiculos(); // Chamando a função logo após o carregamento da página
 
             closePopup.addEventListener('click', function () {
                 popup.style.display = 'none';
