@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // Criando o pop-up dinamicamente
     const popup = document.createElement('div');
     popup.id = 'popup';
     popup.style.position = 'absolute';
@@ -12,25 +13,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const popupHeader = document.createElement('div');
     popupHeader.className = 'popup-header';
+    popupHeader.style.display = 'flex';
+    popupHeader.style.justifyContent = 'space-between';
+    popupHeader.style.alignItems = 'center';
+    popupHeader.style.backgroundColor = '#f0f0f0';
+    popupHeader.style.padding = '5px 10px';
+    popupHeader.style.fontWeight = 'bold';
     popupHeader.textContent = 'Texto citado';
 
     const closeButton = document.createElement('button');
     closeButton.textContent = 'X';
+    closeButton.style.border = 'none';
+    closeButton.style.fontSize = '16px';
+    closeButton.style.cursor = 'pointer';
     closeButton.addEventListener('click', () => popup.style.display = 'none');
     popupHeader.appendChild(closeButton);
     popup.appendChild(popupHeader);
 
     const popupContent = document.createElement('div');
     popupContent.className = 'popup-content';
+    popupContent.style.padding = '10px';
     popup.appendChild(popupContent);
     document.body.appendChild(popup);
 
     function detectarVersiculos() {
         const content = document.querySelector('.content');
         const regex = /\b([A-ZÁÉÍÓÚ][a-záéíóú]+)\s(\d+):(\d+(-\d+)?)\b/g;
-        
+
         content.innerHTML = content.innerHTML.replace(regex, (match, livro, capitulo, versiculo) => {
-            const ref = `acf-${livro.toLowerCase().replace(/\s/g, '')}.xml`; // Ajuste no nome do arquivo
+            const ref = `acf-${livro.toLowerCase().replace(/\s/g, '')}.xml`;
             return `<span class="versiculo" data-ref="${ref}" data-chapter="${capitulo}" data-verse="${versiculo}">${match}</span>`;
         });
 
@@ -47,16 +58,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     const xmlText = await response.text();
                     const xmlDoc = new DOMParser().parseFromString(xmlText, 'text/xml');
-                    
-                    // Ajuste na busca dentro do XML
-                    const chapterElement = xmlDoc.querySelector(`chapter[number="${chapter}"]`);
-                    const verseElement = chapterElement ? chapterElement.querySelector(`verse[number="${verse}"]`) : null;
-                    const verseText = verseElement ? verseElement.textContent : 'Versículo não encontrado.';
+
+                    // Correção: buscar o capítulo e versículo corretamente
+                    const chapters = xmlDoc.querySelectorAll('chapter');
+                    let verseText = 'Versículo não encontrado.';
+
+                    chapters.forEach(chapterElement => {
+                        if (chapterElement.getAttribute('number') === chapter) {
+                            const verseElement = chapterElement.querySelector(`verse[number="${verse}"]`);
+                            if (verseElement) {
+                                verseText = verseElement.textContent;
+                            }
+                        }
+                    });
 
                     popupContent.innerHTML = `<strong>${versiculo.textContent}</strong><br>${verseText}`;
                     popup.style.display = 'block';
-                    popup.style.left = `${e.pageX + 10}px`;
-                    popup.style.top = `${e.pageY + 10}px`;
+                    const popupWidth = popup.offsetWidth;
+                    const popupHeight = popup.offsetHeight;
+                    let left = e.pageX + 10;
+                    let top = e.pageY + 10;
+
+                    if (left + popupWidth > window.innerWidth) {
+                        left = window.innerWidth - popupWidth - 10;
+                    }
+                    if (top + popupHeight > window.innerHeight) {
+                        top = window.innerHeight - popupHeight - 10;
+                    }
+
+                    popup.style.left = `${left}px`;
+                    popup.style.top = `${top}px`;
                 } catch (error) {
                     popupContent.innerHTML = `Erro ao carregar o versículo: ${error.message}`;
                 }
