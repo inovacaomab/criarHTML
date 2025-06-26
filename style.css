@@ -1,0 +1,27 @@
+.container {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 24px;
+    background: #fafafa;
+    border-radius: 8px;
+    box-shadow: 2px 2px 8px #bbb;
+    text-align: center;
+}
+textarea {
+    width: 100%;
+    font-size: 1.1em;
+    padding: 8px;
+    margin-bottom: 12px;
+}
+button {
+    padding: 8px 20px;
+    font-size: 1em;
+    margin-bottom: 12px;
+}
+a {
+    display: inline-block;
+    margin-top: 10px;
+}
+input[type="text"] {
+    padding: 8px;
+}
