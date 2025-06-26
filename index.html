@@ -2,126 +2,19 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Referências Bíblicas Personalizadas</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 20px;
-            background-color: #f9f9f9;
-        }
-        .content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-        }
-        .versiculo {
-            color: blue;
-            text-decoration: underline;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .versiculo:hover {
-            background-color: #e6f3ff;
-        }
-        .popup {
-            display: none;
-            position: absolute;
-            background-color: white;
-            border: 1px solid #ccc;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
-            z-index: 1000;
-            max-width: 400px;
-            min-width: 300px;
-            border-radius: 5px;
-        }
-        .popup-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #f0f0f0;
-            border-bottom: 1px solid #ccc;
-            padding: 8px 12px;
-            font-weight: bold;
-            border-top-left-radius: 5px;
-            border-top-right-radius: 5px;
-        }
-        .popup-header button {
-            background-color: transparent;
-            border: none;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 0;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .popup-header button:hover {
-            color: red;
-            background-color: #ddd;
-            border-radius: 3px;
-        }
-        .popup-content {
-            padding: 12px;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-        .popup-footer {
-            background-color: #f0f0f0;
-            border-top: 1px solid #ccc;
-            text-align: center;
-            padding: 5px;
-            font-size: 12px;
-            color: #666;
-            border-bottom-left-radius: 5px;
-            border-bottom-right-radius: 5px;
-        }
-        .loading {
-            text-align: center;
-            padding: 20px;
-            font-style: italic;
-            color: #666;
-        }
-        .error {
-            color: #d32f2f;
-            font-style: italic;
-        }
-    </style>
+    <title>Gerador de HTML para Scriptagger</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="content">
-        <h1>Demas: Uma Reflexão Sobre Apostasia</h1>
-        <p>
-            Demas é uma figura que, embora mencionada brevemente nas Escrituras, carrega uma lição profunda para todos nós.
-            Ele foi um colaborador do apóstolo Paulo, um homem que, por um tempo, se dedicou à causa do evangelho. No entanto,
-            sua história toma um rumo triste, mostrando como o amor pelo mundo pode levar à apostasia, um risco real para
-            qualquer cristão.
-        </p>
-        <p>
-            Vamos explorar sua trajetória, sua fidelidade inicial, sua deserção e o que isso nos ensina sobre a importância
-            de permanecer firmes na fé (Mateus 10:22; Mateus 24:13; João 8:31; 1 Coríntios 15:58; Hebreus 10:23).
-        </p>
-        <p>
-            Como Paulo mesmo alertou: "Porque virá tempo em que não suportarão a sã doutrina" (2 Timóteo 4:3), 
-            e foi exatamente isso que aconteceu com Demas, conforme lemos: "Porque Demas me desamparou, amando o presente século" (2 Timóteo 4:10).
-        </p>
+    <div class="container">
+        <h2>Crie seu conteúdo</h2>
+        <input id="titulo" type="text" placeholder="Digite o título do texto" style="width: 100%; font-size:1.1em; margin-bottom:12px;"/>
+        <br>
+        <textarea id="conteudo" rows="12" cols="70" placeholder="Digite o texto, use referências como no exemplo: (Mateus 10:22)"></textarea>
+        <br>
+        <button id="gerar">Gerar HTML</button>
+        <a id="baixar" style="display:none;" download="novo.html">Baixar HTML</a>
     </div>
-
-    <div id="popup" class="popup">
-        <div class="popup-header">
-            <span>Texto citado</span>
-            <button id="closePopup">×</button>
-        </div>
-        <div class="popup-content" id="popupContent"></div>
-        <div class="popup-footer">
-            Versão ACF
-        </div>
-    </div>
-
-    <script src="references.js"></script>
+    <script src="gerador.js"></script>
 </body>
 </html>
