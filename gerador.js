@@ -3,8 +3,8 @@ document.getElementById('gerar').onclick = function() {
     const titulo = tituloBruto.length > 0 ? tituloBruto : 'Documento Scriptagger';
     const entrada = document.getElementById('conteudo').value;
 
-    // Regex para detectar referências no formato (Mateus 10:22) ou (Mateus 7:1-9)
-    const referenciaRegex = /\(([A-Za-zçãéíõôúêâÁÉÍÓÔÚÊÂ]{2,})\s+(\d+):(\d+)(?:-(\d+))?\)/g;
+    // Regex para detectar referências apenas no formato (Livro cap:vers)
+    const referenciaRegex = /\(([A-Za-zçãéíõôúêâÁÉÍÓÔÚÊÂ]{2,})\s+(\d+):(\d+)\)/g;
 
     // Função para mapear nomes para arquivos XML
     function livroParaArquivo(livro) {
@@ -79,16 +79,9 @@ document.getElementById('gerar').onclick = function() {
         return map[livro] || 'acf-mt.xml';
     }
 
-    // Suporte a versículos únicos e intervalos
-    let conteudoFormatado = entrada.replace(referenciaRegex, (match, livro, cap, versIni, versFim) => {
+    let conteudoFormatado = entrada.replace(referenciaRegex, (match, livro, cap, vers) => {
         const arquivo = livroParaArquivo(livro);
-        if (versFim) {
-            // Intervalo
-            return `<span class="versiculo" data-ref="${arquivo}" data-chapter="${cap}" data-verse="${versIni}" data-verse-end="${versFim}">${livro} ${cap}:${versIni}-${versFim}</span>`;
-        } else {
-            // Único
-            return `<span class="versiculo" data-ref="${arquivo}" data-chapter="${cap}" data-verse="${versIni}">${livro} ${cap}:${versIni}</span>`;
-        }
+        return `<span class="versiculo" data-ref="${arquivo}" data-chapter="${cap}" data-verse="${vers}">${livro} ${cap}:${vers}</span>`;
     });
 
     const htmlFinal = `
